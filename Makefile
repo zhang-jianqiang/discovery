@@ -7,8 +7,8 @@ all: test build
 build:
 	rm -rf dist/
 	mkdir -p dist/conf
-	cp cmd/discovery/discovery-example.toml dist/conf/discovery.toml
-	$(GOBUILD) -o dist/bin/discovery cmd/discovery/main.go
+	cp cmd/discovery/discovery.toml dist/conf/discovery.toml
+	$(GOBUILD) -o dist/discovery cmd/discovery/main.go
 
 test:
 	$(GOTEST) -v ./...
@@ -17,7 +17,9 @@ clean:
 	rm -rf dist/
 
 run:
-	nohup dist/bin/discovery -conf dist/conf -confkey discovery.toml -log.dir dist/log & > dist/nohup.out
+	# 注意-conf后面的参数是配置文件所有目录，不能是具体文件，具体原因可以看代码
+	nohup dist/discovery -conf=dist/conf 2>&1 > dist/nohup.out &
 
 stop:
-	pkill -f dist/bin/discovery
+	pkill -f dist/discovery
+	#ps -ef|grep dist/discovery |grep -v grep |awk '{print $2}' | xargs kill -9
